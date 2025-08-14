@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'icon.png' %}">
+    <title>To Do List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: rgb(48, 47, 47);
+        }
+        .todo-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: rgb(24, 23, 23);">
+        <div class="container-fluid">
+            <span class="navbar-brand">To-Do List</span>
+            <div class="ms-auto text-white me-3">
+                Welcome <strong>{{ request.user.username }}</strong>
+            </div>
+            <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">Logout</a>
+        </div>
+    </nav>
+
+    <!-- To-Do Container -->
+    <div class="todo-container">
+        <h3 class="text-center mb-4">Your To-Do List</h3>
+
+        <!-- Add Task Form -->
+        <form method="POST" action="{% url 'add_task' %}" class="input-group mb-3">
+            {% csrf_token %}
+            <input type="text" name="task" class="form-control" placeholder="Add new task" required>
+            <button type="submit" class="btn btn-primary">Add Task</button>
+        </form>
+
+        <!-- Task List Table -->
+        <table class="table table-bordered table-striped">
+            <thead class="table-primary">
+                <tr>
+                    <th style="width: 10%;">S.No</th>
+                    <th>Task</th>
+                    <th style="width: 15%;">Done</th>
+                    <th style="width: 15%;">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tasks %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="{% if task.completed %}completed{% endif %}">{{ task.title }}</td>
+                    <td>
+                        <a href="{% url 'complete_task' task.id %}" class="btn btn-sm btn-success w-100">Done</a>
+                    </td>
+                    <td>
+                        <a href="{% url 'delete_task' task.id %}" class="btn btn-sm btn-danger w-100">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No tasks yet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
